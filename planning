@@ -25,6 +25,8 @@ attributes
 methods
     - get_betting_cards
     - get_token
+    - add_token(int)
+    - add_betting_card(betting_card)
 
 terminal interface
 NOTE: USE SOME PYTHON LIBRARY
