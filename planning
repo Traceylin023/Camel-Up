@@ -1,0 +1,44 @@
+game class
+
+attributes
+    - blocks (list)
+        - list of camel
+    - available rolls left
+        - a list of colors (then randomly generate)
+    - available betting tickets
+
+methods
+    - is_valid_move
+    - generate_random_roll
+    - get_betting-tickets
+    - move_camel
+    - give_coin
+    - give_betting
+
+player class
+
+attributes
+    - betting cards
+    - token
+    - name
+
+methods
+    - get_betting_cards
+    - get_token
+
+terminal interface
+NOTE: USE SOME PYTHON LIBRARY
+
+attrubute: Game(), 2 PLayer()
+
+- ask what the player want to do
+    - betting/rolling
+        - betting:
+            display available betting cards -> pick which to bet
+        - rolling:
+            generate random
+- display
+
+while loop:
+    - keeps the player playing
+    
