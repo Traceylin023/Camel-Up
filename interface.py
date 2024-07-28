@@ -1,7 +1,7 @@
 from game import *
 from player import *
 from colorama import *
-import numpy as np
+import os
 
 
 class Interface:
@@ -12,6 +12,12 @@ class Interface:
         self.player_2 = player_2
         self.main_loop()
 
+    def clear(self):
+        if os.name == 'nt':
+            _ = os.system('cls')
+        else:
+            _ = os.system('clear')
+
     def main_loop(self):
         current_player = player_1
         while True:
@@ -20,7 +26,9 @@ class Interface:
             # finish leg if needed
             if self.game.is_finished_leg():
                 self.game.finish_leg([player_1, player_2])
+                print("************")
                 print("The leg has finished.")
+                print("************")
                 print(f"{player_1} has {player_1.coins} coins, and {player_2} has {player_2.coins} coins.")
 
 
@@ -30,7 +38,7 @@ class Interface:
             match action[0]:
                 case MoveType.bet:
                     betting_card = action[1]
-                    print(f"{current_player} has taken {betting_card}")
+                    print(f"***\n{current_player} has taken {betting_card}\n***")
                     current_player.add_betting_cards(betting_card)
                 case MoveType.quit:
                     break
@@ -39,7 +47,7 @@ class Interface:
                     color, result = self.game.generate_random_roll()
                     camel = self.game.get_camel(color)
                     self.game.move_camel(camel, result)
-                    print(f"{Camel(color)} has moved by {result}")
+                    print(f"***\n{Camel(color)} has moved by {result}\n***")
             
             # alternate players
             if current_player == player_1:
@@ -47,7 +55,7 @@ class Interface:
             else:
                 current_player = player_1
 
-        print("Thank you for playing Camel Up!")
+        print("*********\nThank you for playing Camel Up!\n*********")
 
 
 
@@ -56,9 +64,13 @@ class Interface:
         init()
 
         # print tickets
+        print("--- Ticket Tent ---")
         print(f"Available Tickets: {self.game.ticket_status()}")
+        print("\n")
 
+        
         # print dice
+        print("--- Dice ---")
         used_dice, available_dice = self.game.dice_status()
 
         used_dice_output = ""
@@ -71,17 +83,23 @@ class Interface:
 
         print(f"Used Dice: {used_dice_output}")
         print(f"Available Dice: {available_dice_output}")
+        print("\n")
 
         # print current board state
+        print("--- Board ---")
         print(f"The current board is:")
         for i, camels in enumerate(self.game.blocks):
-            print(f"{i:02}: {camels}")
+            print(f"{i+1:02}: {camels}")
+        print("\n")
 
+        print("--- Player Status ---")
         print(f"{player_1} has {player_1.get_betting_cards()} betting cards and {player_1.get_tokens()} pyramid tokens")
         print(f"{player_2} has {player_2.get_betting_cards()} betting cards and {player_2.get_tokens()} pyramid tokens")
+        print("\n")
 
     def get_player_input(self, player: Player) -> tuple[MoveType, Any]:
         """Returns a valid move that the `player` would like to take."""
+        print("--- User Input ---")
         print(f"It is {player.name}'s turn. {player.name} may take one of the available betting tokens or roll a die.")
         while True:
             user_input = input("To take a betting token, type 'B'. To roll a die, type 'R'. To exit the game, type 'QUIT'.\n").lower()
