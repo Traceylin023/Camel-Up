@@ -3,20 +3,9 @@ from random import randint, choice
 from typing import Any
 from helper import *
 from player import *
+from termcolor import colored
 
 dice_range = [1, 3]
-
-
-class DiceRoll:
-    def __init__(self, color, result) -> None:
-        assert dice_range[0] <= result
-        assert dice_range[1] >= result
-        self.color = color
-        self.result = result
-
-    def __repr__(self) -> str:
-        return f"{self.color}: {self.result}"
-
 
 class Game:
     """Main game class. Important attributes:
@@ -31,7 +20,7 @@ class Game:
         num_squares = 16
         self.blocks = [[] for _ in range(num_squares)]
         self.camels = [Camel(color) for color in Color]
-        self.available_dice = {color: True for color in Color}
+        self.available_dice = {color: 0 for color in Color}
 
         # move each camel to a random starting position
         for camel in self.camels:
@@ -39,45 +28,73 @@ class Game:
             self.blocks[starting_position].append(camel)
 
         # create our betting tokens
-        self.available_betting_tickets = [
-            BettingTicket(color, value) for color in Color for value in [2, 2, 3, 5]
-        ]
-
-        print(self.available_betting_tickets)
-
-        print(self.generate_random_roll())
+        self.available_betting_tickets = {
+            color: [
+                BettingTicket(color, 2),
+                BettingTicket(color, 2),
+                BettingTicket(color, 3),
+                BettingTicket(color, 5),
+            ]
+            for color in Color
+        }
 
     def is_valid_move(self, move: tuple[MoveType, Any]) -> bool:
         """Returns whether a move is valid, e.g. betting or rolling"""
         move_type = move[0]
-        if move_type == MoveType.token and move[1] == None:
+        if move_type == MoveType.token and move[1] == None and len(self.dice_status()[1]) > 0:
             return True
         elif move_type == MoveType.bet:
             desired_ticket = move[1]
-            for betting_ticket in self.available_betting_tickets:
-                if (
-                    desired_ticket.color == betting_ticket.color
-                    and desired_ticket.value == betting_ticket.value
-                ):
+            for betting_ticket in self.available_betting_tickets[desired_ticket.color]:
+                if desired_ticket.value == betting_ticket.value:
                     return True
 
         return False
-    
+
     def remove_ticket(self, ticket: BettingTicket) -> BettingTicket:
         """Removes a ticket from the currently available tickets. Returns the ticket if successful."""
-        for i, betting_ticket in enumerate(self.available_betting_tickets):
-            if ticket.color == betting_ticket.color and ticket.value == betting_ticket.value:
-                return self.available_betting_tickets.pop(i)
+        for i, betting_ticket in enumerate(
+            self.available_betting_tickets[ticket.color]
+        ):
+            if ticket.value == betting_ticket.value:
+                return self.available_betting_tickets[ticket.color].pop(i)
 
-        raise Exception("Desired betting ticket not found in available betting tickets.")
-
-    def generate_random_roll(self) -> DiceRoll:
-        """Returns a random dice roll as (Color, distance)."""
-        color = choice(
-            [color for color in self.available_dice if self.available_dice[color]]
+        raise Exception(
+            "Desired betting ticket not found in available betting tickets."
         )
-        self.available_dice[color] = False
-        return DiceRoll(color, randint(1, 3))
+
+    def ticket_status(self) -> list[BettingTicket]:
+        """Returns a list of the highest available betting tickets for each color, i.e. the information displayed at the ticket tent."""
+        max_tickets = []
+        for tickets_by_color in self.available_betting_tickets.values():
+            max_tickets.append(tickets_by_color[-1])
+
+        return max_tickets
+
+    def generate_random_roll(self) -> tuple[Color, int]:
+        """Returns a random dice roll as (Color, distance)."""
+        color = choice([color for color, result in self.available_dice.items() if result == 0])
+        roll = randint(*dice_range)
+        self.available_dice[color] = roll
+        return (color, roll)
+    
+    def dice_status(self) -> tuple[list[tuple[Color, int]], list[tuple[Color, int]]]:
+        """Returns a tuple containing a list of used dice and unused dice. Each dice is represented by a color and a integer result."""
+        used_dice = []
+        available_dice = []
+        for color, result in self.available_dice.items():
+            if result != 0:
+                used_dice.append((color, result))
+            else:
+                available_dice.append((color, result))
+
+        return (used_dice, available_dice)
+
+    def get_camel(self, color: Color) -> Camel:
+        for camel in self.camels:
+            if camel.color == color:
+                return camel
+        return None
 
     def move_camel(self, camel: Camel, distance: int) -> None:
         """Takes a camel and moves it from its current position in `self.blocks` to that position + `distance`.
@@ -95,16 +112,19 @@ class Game:
                 stack_position = current_order.index(
                     camel
                 )  # find the position of our camel in the stack
-                camels_to_move = current_order[
-                    stack_position:-1
-                ]  # get a list of our camel and all above it
+                if stack_position < len(current_order) - 1:
+                    camels_to_move = current_order[
+                        stack_position:
+                    ]  # get a list of our camel and all above it
+                print(f"{stack_position = }, {camels_to_move = }, {current_order = }, {current_position = }")
                 [
                     current_order.remove(camel) for camel in camels_to_move
                 ]  # remove everything from the current position
 
         # move camels to ending position
         final_position = current_position + distance
-        self.blocks[final_position].append(camels_to_move)
+        for camel in camels_to_move:
+            self.blocks[final_position].append(camel)
 
     def give_coin(self, players: list[Player]):
         """At the end of the leg, distributes coins from rolls to the players based on the current game state."""
@@ -120,7 +140,7 @@ class Game:
             for camel in block:
                 camel_ordering.append(camel)
 
-        winning_camel, second_camel = camel_ordering[-2:-1]
+        winning_camel, second_camel = camel_ordering[-1], camel_ordering[-2]
 
         for player in players:
             for betting_ticket in player.get_betting_cards():
@@ -131,6 +151,21 @@ class Game:
                 else:
                     player.coins -= 1
 
+    def finish_leg(self, players: list[Player]):
+        """Housekeeping at the end of each leg of the game."""
+        self.give_coin(players)
+        self.give_betting(players)
+        self.available_dice = {color: 0 for color in Color}
+        for player in players:
+            player.betting_cards = []
+            player.token = 0
+
+    def is_finished_leg(self) -> bool:
+        """Returns whether the leg has finished."""
+        if len(self.dice_status()[1]) == 0:
+            return True
+
+        return False
 
 if __name__ == "__main__":
-    Game()
+    manager = Game()
