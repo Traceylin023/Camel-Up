@@ -1,6 +1,7 @@
 """
 Classes and attributes that may be needed in more than one file.
 """
+
 from enum import Enum
 from termcolor import colored
 
@@ -12,7 +13,7 @@ class Color(Enum):
     yellow = "YELLOW"
     purple = "MAGENTA"
 
-    def __repr__(self) -> str:
+    def __str__(self) -> str:
         return colored(self.name, self.value.lower())
 
     def colorize(self, string) -> str:
@@ -25,8 +26,15 @@ class Camel:
 
     def __repr__(self) -> str:
         return colored(self.color.name[0].upper(), self.color.value.lower())
+
     def __str__(self) -> str:
         return colored(self.color.name[0].upper(), self.color.value.lower())
+
+    def __eq__(self, other_camel):
+        if isinstance(other_camel, Camel):
+            return self.color == other_camel.color
+        return False
+
 
 class BettingTicket:
     def __init__(self, color: Color, price: int):
@@ -36,6 +44,11 @@ class BettingTicket:
 
     def __repr__(self) -> str:
         return colored(self.value, self.color.value.lower())
+
+    def __eq__(self, other_ticket) -> bool:
+        if isinstance(other_ticket, BettingTicket):
+            return (self.color == other_ticket.color) and (self.value == other_ticket.value)
+        return False
 
 
 class MoveType(Enum):

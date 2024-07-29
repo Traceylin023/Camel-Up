@@ -7,6 +7,7 @@ from termcolor import colored
 
 dice_range = [1, 3]
 
+
 class Game:
     """Main game class. Important attributes:
     - blocks [list] a mapping of the current board and camel positions
@@ -17,8 +18,8 @@ class Game:
     def __init__(self) -> None:
         """Creates a Game object."""
         # initialize variables
-        num_squares = 16
-        self.blocks = [[] for _ in range(num_squares)]
+        self.num_squares = 16
+        self.blocks = [[] for _ in range(self.num_squares)]
         self.camels = [Camel(color) for color in Color]
         self.available_dice = {color: 0 for color in Color}
 
@@ -41,7 +42,11 @@ class Game:
     def is_valid_move(self, move: tuple[MoveType, Any]) -> bool:
         """Returns whether a move is valid, e.g. betting or rolling"""
         move_type = move[0]
-        if move_type == MoveType.token and move[1] == None and len(self.dice_status()[1]) > 0:
+        if (
+            move_type == MoveType.token
+            and move[1] == None
+            and len(self.dice_status()[1]) > 0
+        ):
             return True
         elif move_type == MoveType.bet:
             desired_ticket = move[1]
@@ -73,11 +78,13 @@ class Game:
 
     def generate_random_roll(self) -> tuple[Color, int]:
         """Returns a random dice roll as (Color, distance)."""
-        color = choice([color for color, result in self.available_dice.items() if result == 0])
+        color = choice(
+            [color for color, result in self.available_dice.items() if result == 0]
+        )
         roll = randint(*dice_range)
         self.available_dice[color] = roll
         return (color, roll)
-    
+
     def dice_status(self) -> tuple[list[tuple[Color, int]], list[tuple[Color, int]]]:
         """Returns a tuple containing a list of used dice and unused dice. Each dice is represented by a color and a integer result."""
         used_dice = []
@@ -91,14 +98,15 @@ class Game:
         return (used_dice, available_dice)
 
     def get_camel(self, color: Color) -> Camel:
+        """Returns the camel matching a given color."""
         for camel in self.camels:
             if camel.color == color:
                 return camel
         return None
 
-    def move_camel(self, camel: Camel, distance: int) -> None:
+    def move_camel(self, camel: Camel, distance: int) -> int:
         """Takes a camel and moves it from its current position in `self.blocks` to that position + `distance`.
-        Must consider the stacked ordering. Will move camels above the current one."""
+        Must consider the stacked ordering. Will move camels above the current one. Returns the final position of the camel stack."""
         # initialize variables
         current_position = 0
         camels_to_move = [camel]
@@ -116,15 +124,20 @@ class Game:
                     camels_to_move = current_order[
                         stack_position:
                     ]  # get a list of our camel and all above it
-                print(f"{stack_position = }, {camels_to_move = }, {current_order = }, {current_position = }")
+                # print(f"{stack_position = }, {camels_to_move = }, {current_order = }, {current_position = }")
                 [
                     current_order.remove(camel) for camel in camels_to_move
                 ]  # remove everything from the current position
 
         # move camels to ending position
         final_position = current_position + distance
+
+        if final_position >= self.num_squares:
+            final_position = self.num_squares - 1
+
         for camel in camels_to_move:
             self.blocks[final_position].append(camel)
+        return final_position
 
     def give_coin(self, players: list[Player]):
         """At the end of the leg, distributes coins from rolls to the players based on the current game state."""
@@ -166,6 +179,7 @@ class Game:
             return True
 
         return False
+
 
 if __name__ == "__main__":
     manager = Game()
