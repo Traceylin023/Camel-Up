@@ -13,12 +13,14 @@ class Interface:
         self.main_loop()
 
     def clear(self):
+        """Clears the current display."""
         if os.name == "nt":
             _ = os.system("cls")
         else:
             _ = os.system("clear")
 
     def main_loop(self):
+        """The game run loop."""
         self.clear()
         current_player = player_1
         while True:
@@ -44,6 +46,7 @@ class Interface:
                         f"***\n{current_player} has taken {betting_card}\n***"
                     )
                     current_player.add_betting_cards(betting_card)
+                    self.game.remove_ticket(betting_card)
                 case MoveType.quit:
                     print("*********\nThank you for playing Camel Up!\n*********")
                     return
