@@ -144,16 +144,23 @@ class Game:
         for player in players:
             player.coins += player.get_tokens()
 
-    def give_betting(self, players: list[Player]):
-        """At the end of the leg, distributes betting coins to the players based on the current game state."""
+
+    def get_winning_camels(self, blocks=None) -> tuple[Camel, Camel]:
+        """Returns a ordered tuple of the top two camels. If no `blocks` is passed in, evaluates self. If `blocks` is passedd, evaluates that game state."""
+        if blocks is None:
+            blocks = self.blocks
         # evaluate the status of each camel
         camel_ordering = []
-        for block in self.blocks:
+        for block in blocks:
             # iterate over the list backwards
             for camel in block:
                 camel_ordering.append(camel)
 
-        winning_camel, second_camel = camel_ordering[-1], camel_ordering[-2]
+        return camel_ordering[-1], camel_ordering[-2]
+
+    def give_betting(self, players: list[Player]):
+        """At the end of the leg, distributes betting coins to the players based on the current game state."""
+        winning_camel, second_camel = self.get_winning_camels() 
 
         for player in players:
             for betting_ticket in player.get_betting_cards():
