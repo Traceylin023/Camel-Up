@@ -173,6 +173,17 @@ class Game:
             player.betting_cards = []
             player.token = 0
 
+        # reset available betting tickets
+        self.available_betting_tickets = {
+            color: [
+                BettingTicket(color, 2),
+                BettingTicket(color, 2),
+                BettingTicket(color, 3),
+                BettingTicket(color, 5),
+            ]
+            for color in Color
+        }
+
     def is_finished_leg(self) -> bool:
         """Returns whether the leg has finished."""
         if len(self.dice_status()[1]) == 0:
