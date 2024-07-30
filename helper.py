@@ -51,6 +51,8 @@ class BettingTicket:
         if isinstance(other_ticket, BettingTicket):
             return (self.color == other_ticket.color) and (self.value == other_ticket.value)
         return False
+    def get_value(self):
+        return self.value
 
 
 class MoveType(Enum):

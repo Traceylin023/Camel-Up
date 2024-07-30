@@ -243,8 +243,8 @@ class Game:
                 second_place[second_place_camel.get_color()] += 1
         combos = (len(color_permutation) * len(dice_product))
         return [(color, 
-                 first_place[color] / combos * self.ticket_status[color] + 
-                 second_place[color] / combos  
+                 first_place[color] / combos * self.ticket_status()[color].get_value() + 
+                 second_place[color] / combos  - 
                  (combos - first_place[color] - second_place[color]) / combos) for color in Color]
 
 if __name__ == "__main__":
