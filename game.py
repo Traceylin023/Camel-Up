@@ -5,6 +5,7 @@ from helper import *
 from player import *
 from termcolor import colored
 import itertools
+from copy import deepcopy
 
 dice_range = [1, 3]
 
@@ -69,11 +70,11 @@ class Game:
             "Desired betting ticket not found in available betting tickets."
         )
 
-    def ticket_status(self) -> list[BettingTicket]:
+    def ticket_status(self) -> dict:
         """Returns a list of the highest available betting tickets for each color, i.e. the information displayed at the ticket tent."""
-        max_tickets = []
-        for tickets_by_color in self.available_betting_tickets.values():
-            max_tickets.append(tickets_by_color[-1])
+        max_tickets = {}
+        for color in self.available_betting_tickets:
+            max_tickets[color] = self.available_betting_tickets[color][-1]
 
         return max_tickets
 
@@ -204,6 +205,16 @@ class Game:
 
         return False
     
+    def expected_winner(self, board: list[list[Camel]], dice_rolls: tuple, color_permutation: list[Color]) -> tuple[Camel, Camel]:
+        """Takes a starting board state, a list of dice rolls, and the color order of the dice. Returns the top two camels."""
+        assert len(dice_rolls) == len(color_permutation)
+        new_game = Game() 
+        new_game.blocks = deepcopy(board)
+        for i in range(len(color_permutation)):
+            new_game.move_camel(Camel(color_permutation[i]), dice_rolls[i])
+
+        return new_game.get_winning_camels()
+        
     # *** EXPECTED VALUE CODE ***
 
     def possible_dice_combinations(self) -> list[tuple]:
