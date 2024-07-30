@@ -4,6 +4,7 @@ from typing import Any
 from helper import *
 from player import *
 from termcolor import colored
+import itertools
 
 dice_range = [1, 3]
 
@@ -173,12 +174,17 @@ class Game:
 
     def finish_leg(self, players: list[Player]):
         """Housekeeping at the end of each leg of the game."""
+        # distribute coins
         self.give_coin(players)
         self.give_betting(players)
-        self.available_dice = {color: 0 for color in Color}
+
+        # reset players
         for player in players:
             player.betting_cards = []
             player.token = 0
+
+        # reset dice
+        self.available_dice = {color: 0 for color in Color}
 
         # reset available betting tickets
         self.available_betting_tickets = {
@@ -197,6 +203,14 @@ class Game:
             return True
 
         return False
+    
+    # *** EXPECTED VALUE CODE ***
+
+    def possible_dice_combinations(self) -> list[tuple]:
+        """Returns a list of all possible dice combinations"""
+        _, available_dice = self.dice_status()
+        return list(itertools.product([1, 2, 3] * len(available_dice)))
+
 
 
 if __name__ == "__main__":

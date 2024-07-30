@@ -114,5 +114,21 @@ class GameTester(unittest.TestCase):
         self.assertEqual(self.game.blocks, goal_board)
         self.assertEqual(final_position, self.game.num_squares - 1)
 
+    # *** EXPECTED VALUES ***
+    def test_combinations_of_one_die(self):
+        self.game.available_dice = {color: 1 for color in Color}
+        self.game.available_dice[Color.red] = 0
+
+        possible_dice = self.game.possible_dice_combinations()
+        self.assertEqual(possible_dice, [(1, ), (2, ), (3, )])
+
+    def test_combinations_of_two_dice(self):
+        self.game.available_dice = {color: 1 for color in Color}
+        self.game.available_dice[Color.red] = 0
+        self.game.available_dice[Color.yellow] = 0
+
+        possible_dice = self.game.possible_dice_combinations()
+        self.assertEqual(possible_dice, [(1, 1), (1, 2), (1, 3), (2, 1), (2, 2), (2, 3), (3, 1), (3, 2), (3, 3)])
+
 if __name__ == '__main__':
     unittest.main()
