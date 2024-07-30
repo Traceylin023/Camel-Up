@@ -77,7 +77,7 @@ class Interface:
 
         # print tickets
         print("--- Ticket Tent ---")
-        print(f"Available Tickets: {self.game.ticket_status()}")
+        print(f"Available Tickets: {list(self.game.ticket_status().values())}")
         print("\n")
 
         # print dice
