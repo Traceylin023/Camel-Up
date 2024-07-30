@@ -63,7 +63,10 @@ class Interface:
             self.clear()
             print(output_message)
             if not self.game.is_finished_leg():
-                print(f"EV: {self.game.EV()}")
+                print("EV")
+                EVs = self.game.EV()
+                for ev in EVs:
+                    print(f"{ev[0]}: {round(ev[1], 2)}")
 
             # alternate players
             if current_player == player_1:
@@ -140,6 +143,9 @@ class Interface:
                 )
                 while True:
                     ticket_color = input("").lower()
+                    if ticket_color == "quit":
+                        move = (MoveType.quit, None)
+                        break
                     if ticket_color in ["r", "y", "g", "b", "p"]:
                         match ticket_color:
                             case "r":
