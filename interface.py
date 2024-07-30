@@ -54,9 +54,10 @@ class Interface:
                     current_player.add_tokens(1)
                     color, result = self.game.generate_random_roll()
                     camel = self.game.get_camel(color)
-                    final_square = self.game.move_camel(camel, result)
-                    if final_square > self.game.num_squares:
+                    final_square, game_end = self.game.move_camel(camel, result)
+                    if game_end:
                         self.finish_game()
+                        break
                     output_message = f"***\n{Camel(color)} has moved by {result}\n***"
 
             self.clear()

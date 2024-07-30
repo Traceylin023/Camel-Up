@@ -132,13 +132,15 @@ class Game:
 
         # move camels to ending position
         final_position = current_position + distance
+        game_end = False
 
         if final_position >= self.num_squares:
             final_position = self.num_squares - 1
+            game_end = True
 
         for camel in camels_to_move:
             self.blocks[final_position].append(camel)
-        return final_position
+        return (final_position, game_end)
 
     def give_coin(self, players: list[Player]):
         """At the end of the leg, distributes coins from rolls to the players based on the current game state."""
@@ -209,9 +211,22 @@ class Game:
     def possible_dice_combinations(self) -> list[tuple]:
         """Returns a list of all possible dice combinations"""
         _, available_dice = self.dice_status()
-        return list(itertools.product([1, 2, 3] * len(available_dice)))
-
-
+        color_permutation = itertools.permutations(available_dice)
+        dice_product = [1, 2, 3]
+        for i in range(len(available_dice) - 1):
+            dice_product = list(itertools.product([1, 2, 3], dice_product))
+        first_place = {color:0 for color in Color}
+        second_place = {color:0 for color in Color}
+        for color in color_permutation:
+            for dice_roll in dice_product:
+                first_place_camel, second_place_camel = expected_winner(self.blocks, color, dice_roll)
+                first_place[first_place_camel] += 1
+                second_place[second_place_camel] += 1
+        combos = (len(color_permutation) * len(dice_product))
+        return [(color, 
+                 first_place[color] / combos * self.ticket_status[color] + 
+                 second_place[color] / combos  
+                 (combos - first_place[color] - second_place[color]) / combos) for color in Color]
 
 if __name__ == "__main__":
     manager = Game()
