@@ -34,6 +34,8 @@ class Camel:
         if isinstance(other_camel, Camel):
             return self.color == other_camel.color
         return False
+    def get_color(self):
+        return self.color
 
 
 class BettingTicket:

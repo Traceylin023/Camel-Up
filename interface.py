@@ -39,6 +39,7 @@ class Interface:
             # get users action
             action = self.get_player_input(current_player)
             output_message = ""
+            print(f"EV: {self.game.EV()}")
             match action[0]:
                 case MoveType.bet:
                     betting_card = action[1]

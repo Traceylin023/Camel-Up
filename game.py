@@ -207,8 +207,10 @@ class Game:
 
         return False
     
-    def expected_winner(self, board: list[list[Camel]], dice_rolls: tuple, color_permutation: list[Color]) -> tuple[Camel, Camel]:
+    def expected_winner(self, board: list[list[Camel]], dice_rolls: tuple[int], color_permutation: tuple[Color]) -> tuple[Camel, Camel]:
         """Takes a starting board state, a list of dice rolls, and the color order of the dice. Returns the top two camels."""
+        # print(f"dice roll: {len(dice_rolls)}")
+        # print(f"color permuation: {len(color_permutation)}")
         assert len(dice_rolls) == len(color_permutation)
         new_game = Game() 
         new_game.blocks = deepcopy(board)
@@ -219,20 +221,26 @@ class Game:
         
     # *** EXPECTED VALUE CODE ***
 
-    def possible_dice_combinations(self) -> list[tuple]:
+    def EV(self) -> list[tuple]:
         """Returns a list of all possible dice combinations"""
         _, available_dice = self.dice_status()
-        color_permutation = itertools.permutations(available_dice)
+        available_dice = [x[0] for x in available_dice]
+        color_permutation = list(itertools.permutations(available_dice))
         dice_product = [1, 2, 3]
         for i in range(len(available_dice) - 1):
             dice_product = list(itertools.product([1, 2, 3], dice_product))
+            if i > 0:
+                for j, tup in enumerate(dice_product):
+                    tup = [tup[0]] + list(tup[1])
+                    dice_product[j] = tuple(tup)
+            # print(f"{i}: {dice_product}\n")
         first_place = {color:0 for color in Color}
         second_place = {color:0 for color in Color}
         for color in color_permutation:
             for dice_roll in dice_product:
-                first_place_camel, second_place_camel = expected_winner(self.blocks, color, dice_roll)
-                first_place[first_place_camel] += 1
-                second_place[second_place_camel] += 1
+                first_place_camel, second_place_camel = self.expected_winner(self.blocks, dice_roll, color)
+                first_place[first_place_camel.get_color()] += 1
+                second_place[second_place_camel.get_color()] += 1
         combos = (len(color_permutation) * len(dice_product))
         return [(color, 
                  first_place[color] / combos * self.ticket_status[color] + 
