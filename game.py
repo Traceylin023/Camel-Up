@@ -234,6 +234,10 @@ class Game:
                     tup = [tup[0]] + list(tup[1])
                     dice_product[j] = tuple(tup)
             # print(f"{i}: {dice_product}\n")
+        if len(available_dice) == 1:
+            dice_product = [(1,), (2,), (3,)]
+        print(f"len available dice: {len(available_dice)}")
+        print(f"dice_product: {dice_product}")
         first_place = {color:0 for color in Color}
         second_place = {color:0 for color in Color}
         for color in color_permutation:

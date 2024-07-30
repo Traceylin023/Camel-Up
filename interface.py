@@ -39,7 +39,6 @@ class Interface:
             # get users action
             action = self.get_player_input(current_player)
             output_message = ""
-            print(f"EV: {self.game.EV()}")
             match action[0]:
                 case MoveType.bet:
                     betting_card = action[1]
@@ -63,6 +62,8 @@ class Interface:
 
             self.clear()
             print(output_message)
+            if not self.game.is_finished_leg():
+                print(f"EV: {self.game.EV()}")
 
             # alternate players
             if current_player == player_1:
