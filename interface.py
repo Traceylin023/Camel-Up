@@ -30,6 +30,8 @@ class Interface:
                 print("************")
                 print("The leg has finished.")
                 print("************")
+                winner, second = self.game.get_winning_camels()
+                print(f"The winner of the leg is {winner}, and second place is {second}!")
                 print(
                     f"{player_1} has {player_1.coins} coins, and {player_2} has {player_2.coins} coins."
                 )
@@ -81,10 +83,11 @@ class Interface:
         print("\n")
 
         # print EV
-        print("EV")
+        print("--- EV ---")
         EVs = self.game.EV()
         for ev in EVs:
             print(f"{ev[0]}: {round(ev[1], 2)}")
+        print("\n")
 
         # print dice
         print("--- Dice ---")
