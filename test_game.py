@@ -119,9 +119,11 @@ class GameTester(unittest.TestCase):
 
     def test_EV_for_last_camel(self):
         """Test EV of last camel to be -1"""
+        self.game.blocks = [[] for _ in range(16)]
         for camel in self.game.camels:
-            starting_position = randint(1, 3) - 1
-            self.blocks[starting_position].append(camel)
+            self.blocks[15].append(camel)
+        self.game.move_camel(self.game.camels[0], -1)
+        self.assertEqual(self.EV()[self.game.camels[0].get_color()]
 
 if __name__ == '__main__':
     unittest.main()

@@ -86,7 +86,7 @@ class Interface:
         print("--- EV ---")
         EVs = self.game.EV()
         for ev in EVs:
-            print(f"{ev[0]}: {round(ev[1], 2)}")
+            print(f"{ev}: {round(EVs[ev], 2)}")
         print(f"rolling: 1")
         print("\n")
 
