@@ -120,10 +120,33 @@ class GameTester(unittest.TestCase):
     def test_EV_for_last_camel(self):
         """Test EV of last camel to be -1"""
         self.game.blocks = [[] for _ in range(16)]
+        self.game.available_dice = {color: 1 for color in Color}
+        self.game.available_dice[Color.purple] = 0
         for camel in self.game.camels:
-            self.blocks[15].append(camel)
-        self.game.move_camel(self.game.camels[0], -1)
-        self.assertEqual(self.EV()[self.game.camels[0].get_color()]
+            self.game.blocks[15].append(camel)
+        self.game.move_camel(self.game.camels[-1], -10)
+        self.assertEqual(self.game.EV()[self.game.camels[-1].get_color()], -1)
+
+    def test_EV_for_first_camel(self):
+        """Test EV of first camel to be 5"""
+        self.game.blocks = [[] for _ in range(16)]
+        self.game.available_dice = {color: 1 for color in Color}
+        self.game.available_dice[Color.purple] = 0
+        for camel in self.game.camels:
+            self.game.blocks[1].append(camel)
+        self.game.move_camel(self.game.camels[-1], 10)
+        self.assertEqual(self.game.EV()[self.game.camels[-1].get_color()], 5)
+
+    def test_EV_for_second_camel(self):
+        """Test EV of second camel to be 1"""
+        self.game.blocks = [[] for _ in range(16)]
+        self.game.available_dice = {color: 1 for color in Color}
+        self.game.available_dice[Color.purple] = 0
+        for camel in self.game.camels:
+            self.game.blocks[1].append(camel)
+        self.game.move_camel(self.game.camels[-1], 10)
+        self.game.move_camel(self.game.camels[-2], 9)
+        self.assertEqual(self.game.EV()[self.game.camels[-2].get_color()], 1)
 
 if __name__ == '__main__':
     unittest.main()
