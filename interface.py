@@ -143,6 +143,10 @@ class Interface:
                 break
 
             elif user_input == "b":
+                if len(self.game.ticket_status()) == 0:
+                    print(f"There are no available betting tickets. You cannot select a betting ticket.")
+                    continue
+
                 print(
                     f"Please choose a betting ticket from {self.game.ticket_status().values()}.\nEnter 'R' for RED, 'Y' for YELLOW, 'G' for GREEN, 'B' for BLUE, or 'P' for PURPLE."
                 )
