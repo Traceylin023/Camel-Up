@@ -139,7 +139,7 @@ class Interface:
 
             elif user_input == "b":
                 print(
-                    f"Please choose a betting ticket from {self.game.ticket_status()}.\nEnter 'R' for RED, 'Y' for YELLOW, 'G' for GREEN, 'B' for BLUE, or 'P' for PURPLE."
+                    f"Please choose a betting ticket from {self.game.ticket_status().values()}.\nEnter 'R' for RED, 'Y' for YELLOW, 'G' for GREEN, 'B' for BLUE, or 'P' for PURPLE."
                 )
                 while True:
                     ticket_color = input("").lower()
@@ -192,11 +192,11 @@ class Interface:
 
 if __name__ == "__main__":
     print("Welcome to Camel Up!")
-    # player_1_name = input("Enter Player 1's name: ")
-    player_1_name = "Alice"
+    player_1_name = input("Enter Player 1's name: ")
+    # player_1_name = "Alice"
     player_1 = Player(player_1_name)
-    player_2_name = "Bob"
-    # player_2_name = input("Enter Player 2's name: ")
+    # player_2_name = "Bob"
+    player_2_name = input("Enter Player 2's name: ")
     player_2 = Player(player_2_name)
     game = Game()
     interface = Interface(game, player_1, player_2)
