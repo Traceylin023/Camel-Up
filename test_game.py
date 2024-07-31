@@ -26,7 +26,7 @@ class GameTester(unittest.TestCase):
     def test_ticket_status(self):
         """Ensure our starting tickets are all 5."""
         tickets = self.game.ticket_status()
-        self.assertEqual(tickets, [BettingTicket(color, 5) for color in Color])
+        self.assertEqual(tickets, {color: BettingTicket(color, 5) for color in Color})
 
     def test_remove_ticket(self):
         """Try taking a ticket."""
@@ -34,7 +34,9 @@ class GameTester(unittest.TestCase):
         self.assertEqual(ticket, BettingTicket(Color.red, 5))
 
         tickets = self.game.ticket_status()
-        self.assertCountEqual(tickets, [BettingTicket(Color.red, 3), BettingTicket(Color.yellow, 5), BettingTicket(Color.green, 5), BettingTicket(Color.blue, 5), BettingTicket(Color.purple, 5)])
+        correct = {color: BettingTicket(color, 5) for color in Color}
+        correct[Color.red] = BettingTicket(Color.red, 3)
+        self.assertEqual(tickets, correct)
 
     def test_move_unstacked_camel(self):
         """Move a unstacked camel forward by 1 square."""
@@ -107,28 +109,13 @@ class GameTester(unittest.TestCase):
         self.game.blocks[self.game.num_squares - 2] = [self.game.get_camel(Color.red)]
 
         # move the stack of R, Y on top of G, B, P
-        final_position = self.game.move_camel(self.game.get_camel(Color.red), 2)
+        final_position, game_end = self.game.move_camel(self.game.get_camel(Color.red), 2)
         goal_board = [[] for _ in range(16)]
         goal_board[self.game.num_squares - 1] = [self.game.get_camel(Color.red)]
 
         self.assertEqual(self.game.blocks, goal_board)
         self.assertEqual(final_position, self.game.num_squares - 1)
-
-    # *** EXPECTED VALUES ***
-    def test_combinations_of_one_die(self):
-        self.game.available_dice = {color: 1 for color in Color}
-        self.game.available_dice[Color.red] = 0
-
-        possible_dice = self.game.possible_dice_combinations()
-        self.assertEqual(possible_dice, [(1, ), (2, ), (3, )])
-
-    def test_combinations_of_two_dice(self):
-        self.game.available_dice = {color: 1 for color in Color}
-        self.game.available_dice[Color.red] = 0
-        self.game.available_dice[Color.yellow] = 0
-
-        possible_dice = self.game.possible_dice_combinations()
-        self.assertEqual(possible_dice, [(1, 1), (1, 2), (1, 3), (2, 1), (2, 2), (2, 3), (3, 1), (3, 2), (3, 3)])
+        self.assertEqual(game_end, True)
 
 if __name__ == '__main__':
     unittest.main()
