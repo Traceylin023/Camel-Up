@@ -62,11 +62,6 @@ class Interface:
 
             self.clear()
             print(output_message)
-            if not self.game.is_finished_leg():
-                print("EV")
-                EVs = self.game.EV()
-                for ev in EVs:
-                    print(f"{ev[0]}: {round(ev[1], 2)}")
 
             # alternate players
             if current_player == player_1:
@@ -84,6 +79,12 @@ class Interface:
         print("--- Ticket Tent ---")
         print(f"Available Tickets: {list(self.game.ticket_status().values())}")
         print("\n")
+
+        # print EV
+        print("EV")
+        EVs = self.game.EV()
+        for ev in EVs:
+            print(f"{ev[0]}: {round(ev[1], 2)}")
 
         # print dice
         print("--- Dice ---")
