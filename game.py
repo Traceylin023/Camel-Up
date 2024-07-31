@@ -74,7 +74,9 @@ class Game:
         """Returns a list of the highest available betting tickets for each color, i.e. the information displayed at the ticket tent."""
         max_tickets = {}
         for color in self.available_betting_tickets:
-            max_tickets[color] = self.available_betting_tickets[color][-1]
+            tickets = self.available_betting_tickets[color]
+            if len(tickets) > 0:
+                max_tickets[color] = tickets[-1]
 
         return max_tickets
 
