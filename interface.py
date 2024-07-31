@@ -87,6 +87,7 @@ class Interface:
         EVs = self.game.EV()
         for ev in EVs:
             print(f"{ev[0]}: {round(ev[1], 2)}")
+        print(f"rolling: 1")
         print("\n")
 
         # print dice
@@ -150,7 +151,20 @@ class Interface:
                     if ticket_color == "quit":
                         move = (MoveType.quit, None)
                         break
-                    if ticket_color in ["r", "y", "g", "b", "p"]:
+                    available_colors = []
+                    for color in self.game.ticket_status():
+                        match color:
+                            case Color.red:
+                                available_colors.append("r")
+                            case Color.yellow:
+                                available_colors.append("y")
+                            case Color.green:
+                                available_colors.append("g")
+                            case Color.blue:
+                                available_colors.append("b")
+                            case Color.purple:
+                                available_colors.append("p")
+                    if ticket_color in available_colors:
                         match ticket_color:
                             case "r":
                                 color = Color.red

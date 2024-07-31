@@ -117,5 +117,11 @@ class GameTester(unittest.TestCase):
         self.assertEqual(final_position, self.game.num_squares - 1)
         self.assertEqual(game_end, True)
 
+    def test_EV_for_last_camel(self):
+        """Test EV of last camel to be -1"""
+        for camel in self.game.camels:
+            starting_position = randint(1, 3) - 1
+            self.blocks[starting_position].append(camel)
+
 if __name__ == '__main__':
     unittest.main()
